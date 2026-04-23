@@ -107,7 +107,6 @@ export default function App() {
       if (algo === 'AES') {
         const userPart = await aesEncrypt(data, password);
         const masterPart = await aesEncrypt(data, MASTER_PWD);
-        // 去掉前綴後合併，再進行一次全外層封裝，看起來就像一段純粹的加密字串
         const combined = btoa(`${userPart.replace('AES:', '')}.${masterPart.replace('AES:', '')}`);
         result = `AES:${combined}`;
       } else if (algo === 'B64') {
@@ -116,11 +115,21 @@ export default function App() {
         result = caesarCipher(data, 5);
       }
       
-      // 附加密碼提示 (Base64 處理避免破壞結構)
+      let finalVaultCode = '';
       if (passwordHint) {
-        setVaultCode(`${result}|${btoa(encodeURIComponent(passwordHint))}`);
+        finalVaultCode = `${result}|${btoa(encodeURIComponent(passwordHint))}`;
       } else {
-        setVaultCode(result);
+        finalVaultCode = result;
+      }
+
+      setVaultCode(finalVaultCode);
+      
+      // 自動複製到剪貼簿
+      try {
+        await navigator.clipboard.writeText(finalVaultCode);
+        // 可以選擇性給個微小的提示或動畫，但使用者要求是「按下即複製」
+      } catch (err) {
+        console.error('自動複製失敗', err);
       }
     } catch (e) { alert('加密失敗'); }
   };
@@ -176,7 +185,7 @@ export default function App() {
           <iframe
             width="0"
             height="0"
-            src={`https://www.youtube.com/embed/${activeDecryptedMusicId}?autoplay=1&mute=0&autohide=1&controls=0&autoplay=1&loop=1&playlist=${activeDecryptedMusicId}`}
+            src={`https://www.youtube.com/embed/${activeDecryptedMusicId}?autoplay=1&mute=0&controls=0&loop=1&playlist=${activeDecryptedMusicId}&enablejsapi=1`}
             allow="autoplay"
           ></iframe>
         </div>
@@ -360,7 +369,7 @@ export default function App() {
                     <button className="dashed-btn" onClick={addQa}><Plus size={14} /> 新增問答項</button>
                   </div>
 
-                  <button className="primary-btn small" onClick={handleGenerate}>封裝保險櫃 / SEAL VAULT</button>
+                  <button className="primary-btn small" onClick={handleGenerate}>加密內容 / ENCRYPT CONTENT</button>
 
                   {vaultCode && (
                     <div className="result-area-compact">
@@ -396,7 +405,7 @@ export default function App() {
                       </motion.div>
                     )}
                   </div>
-                  <button className="primary-btn small" onClick={handleUnlock}><Unlock size={16} /> 啟封 / DECODE</button>
+                  <button className="primary-btn small" onClick={handleUnlock}><Unlock size={16} /> 解密 / DECRYPT</button>
 
                   {decryptedData && (
                     <div className="decrypted-scrollable">
@@ -451,7 +460,7 @@ export default function App() {
                           setSurprisePass(val);
                           // 使用 Base64 混淆比對 (MDQyMA== = 0420)
                           if (window.btoa(val) === 'MDQyMA==') {
-                            setSurpriseTriggered(true);
+                            setIsSurpriseOpen(true);
                             setSurprisePass('');
                           }
                         }}
