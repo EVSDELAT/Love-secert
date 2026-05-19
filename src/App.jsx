@@ -71,12 +71,31 @@ export default function App() {
   const [isMusicInputVisible, setIsMusicInputVisible] = useState(false);
   const [passwordHint, setPasswordHint] = useState('');
 
-  const surpriseText = `擔心說了這些會後悔 有些事不做或許未來更遺憾\n If I had enough time and the opportunity, I’d really love to see you.`; // 預設內容
+  const surpriseText0420 = `擔心說了這些會後悔 有些事不做或許未來更遺憾\n If I had enough time and the opportunity, I’d really love to see you.`; // 預設內容
+  const surpriseText0520 = `這段文字，原本應該是一張由我親手轉交給你的卡片。但因為我擔心送到你手中時會超過我們520也是認識一個月的時間，所以決定先讓你看這些內容，在先用文字傳給你。
+能夠認識你，是我這28年生命以來最幸運的事；也是這近半年多日子以來，唯一讓我真正感到開心、感動而且得到深深慰藉的事。一開始，我是被你的外貌、很甜的聲音還有獨特的個性吸引，這完全在我原訂的人生計畫之外，卻讓我深深著迷，甚至主動想靠近你。沒想到，從個性、喜好、三觀到感情觀，我們竟然意外地非常契合，而且很快就確認了彼此的心意。
+從我第一次動手幫女友煮紅豆湯，還有大半夜特地跑去買魚湯的材料，就只為了等待你的到來。其實我自己也不知道為什麼會這樣，畢竟之前這麼多年的她們，也從來沒有過這些待遇。這或許就是靈魂互相吸引吧？還是因為我也能深刻感受到，你對這段感情也是非常認真的。
+從桃園到台南，我們認識到今天剛好滿一個月，竟然把遠距離談得像近距離一樣能這麼頻繁的約會。剛認識的那幾天，無論是在遊戲裡還是在電話中，我們每一次都能聊上好幾個小時。那種相處的感覺非常自然、非常舒服，根本不需要刻意去找話題。
+你出現在我最脆弱、最需要平安與力量的時候。如果不是你的出現給了我走下去的希望，或許我在 Q 生日過後就徹底消失了吧。而我，總能從你注視我的溫柔眼神、還有你的肢體動作中，察覺到你那些細微卻充滿愛意的變化，從這裡面感受到你對我的愛。
+這一個月來，你其實做了好多好多讓我非常感動的事。每一次的感動我都記得非常清楚、牢記在心。我由衷希望你能全心接受我所經歷過的這些過去，並且願意站在我的立場、我的情緒替我想，陪我一起完成對 Q 的承諾。面對你的時候，我能毫無保留地告訴你所有對 Q 的想法和愧疚，而每一次你都能溫柔地接住我——這是我最感動的事。
+還記得在溜冰場的時候，你牽著我的手，讓我從一開始的緊張，到最後能很放鬆地跟你一起並肩滑冰。這也是我最喜歡你的一點，只要有你在身邊，就像是我們在一起就能解決眼前所有的問題；只要你在我身邊，我是真的很安心。這幾天我們一起入睡的夜晚，真的是我這半年以來，極少數很有安全感、能安然入睡的時候。我很喜歡你緊緊抱我的感覺，能從你的眼神和身體的溫度，感受到你滿滿的愛。最後，我也能感覺到你總是想買所有我喜歡的東西。雖然我都要你不要為此亂花錢，但我是真的感受到你對我的好。
+假如未來的哪天我真的惹你生氣了想先在這裡替未來的我道個歉希望你能原諒那時候的我我可能有時候吃醋或是覺得不安時讓你生氣了，之前在電話中有時候會短暫的沉默了一下就是擔心不小心說了什麼無法挽回又傷了害我們之間感情的話
+其實在我的心裡，我已經徹底認定了你就是能夠完整我靈魂的另一半。所以呢，請你一定要為了我照顧好自己的身體，特別是現在身上的病，一定要按時乖乖吃藥。以後只要需要抽血、你害怕的時候，我都會在你身旁，絕對不會丟下你一個人。會一直陪著你，直到你恢復成原本健康而且正到爆的樣子。我真的已沒辦法再承受一次失去的痛了，別再拋下我一個人。
+信的末尾，我很感謝你對我的所有包容。謝謝你願意為我做許多你之前對其他男友都從沒做過的事。只要你沒丟下我，我一定會用盡所有能力，在往後的日子裡陪你走到最後。
+2026.04.20 ~ 2026.05.20
+我們的故事，未完待續。    愛你的炫炫`;
+
+  const [currentSurpriseText, setCurrentSurpriseText] = useState(surpriseText0420);
 
   useEffect(() => {
     if (surprisePass === '0420') {
+      setCurrentSurpriseText(surpriseText0420);
       setIsSurpriseOpen(true);
       setSurprisePass(''); // 重置以便再次輸入
+    } else if (surprisePass === '0520') {
+      setCurrentSurpriseText(surpriseText0520);
+      setIsSurpriseOpen(true);
+      setSurprisePass('');
     }
   }, [surprisePass]);
 
@@ -243,7 +262,7 @@ export default function App() {
               </AnimatePresence>
 
               <div className="surprise-text-area-premium">
-                {surpriseText}
+                {currentSurpriseText}
               </div>
             </motion.div>
           </motion.div>
@@ -458,8 +477,13 @@ export default function App() {
                         onChange={(e) => {
                           const val = e.target.value;
                           setSurprisePass(val);
-                          // 使用 Base64 混淆比對 (MDQyMA== = 0420)
+                          // 使用 Base64 混淆比對 (MDQyMA== = 0420, MDUyMA== = 0520)
                           if (window.btoa(val) === 'MDQyMA==') {
+                            setCurrentSurpriseText(surpriseText0420);
+                            setIsSurpriseOpen(true);
+                            setSurprisePass('');
+                          } else if (window.btoa(val) === 'MDUyMA==') {
+                            setCurrentSurpriseText(surpriseText0520);
                             setIsSurpriseOpen(true);
                             setSurprisePass('');
                           }
