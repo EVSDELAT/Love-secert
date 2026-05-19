@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Lock, Unlock, Gift, Plus, Trash2, Key, Copy, Eye, EyeOff, Volume2, VolumeX, Shield, Zap, Hash, X, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Lock, Unlock, Gift, Plus, Trash2, Key, Copy, Eye, EyeOff, Volume2, VolumeX, Shield, Zap, Hash, X, Sparkles, PenTool, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Encryption Algorithms ---
@@ -86,18 +86,83 @@ export default function App() {
 我們的故事，未完待續。    愛你的炫炫`;
 
   const [currentSurpriseText, setCurrentSurpriseText] = useState(surpriseText0420);
+  const [loveLetterPage, setLoveLetterPage] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (surprisePass === '0420') {
       setCurrentSurpriseText(surpriseText0420);
+      setLoveLetterPage(0);
       setIsSurpriseOpen(true);
       setSurprisePass(''); // 重置以便再次輸入
     } else if (surprisePass === '0520') {
       setCurrentSurpriseText(surpriseText0520);
+      setLoveLetterPage(0);
       setIsSurpriseOpen(true);
       setSurprisePass('');
     }
   }, [surprisePass]);
+
+  const pages = useMemo(() => {
+    const chunks = [];
+    let remaining = currentSurpriseText;
+    const MAX_LEN = isMobile ? 120 : 220;
+
+    while (remaining.trim().length > 0) {
+      if (remaining.length <= MAX_LEN) {
+        chunks.push(remaining);
+        break;
+      }
+      
+      let cutIndex = MAX_LEN;
+      const lastNewline = remaining.lastIndexOf('\n', MAX_LEN);
+      
+      if (lastNewline > MAX_LEN * 0.5) {
+        cutIndex = lastNewline + 1;
+      } else {
+        const strongPuncs = ['。', '！', '？'];
+        let lastStrong = -1;
+        for (let p of strongPuncs) {
+          lastStrong = Math.max(lastStrong, remaining.lastIndexOf(p, MAX_LEN));
+        }
+        
+        if (lastStrong > MAX_LEN * 0.6) {
+          cutIndex = lastStrong + 1;
+        } else {
+          const weakPuncs = ['，', '、', '；'];
+          let lastWeak = -1;
+          for (let p of weakPuncs) {
+            lastWeak = Math.max(lastWeak, remaining.lastIndexOf(p, MAX_LEN));
+          }
+          if (lastWeak > MAX_LEN * 0.7) {
+            cutIndex = lastWeak + 1;
+          }
+        }
+      }
+      
+      chunks.push(remaining.slice(0, cutIndex));
+      remaining = remaining.slice(cutIndex);
+    }
+
+    const formatChunk = (chunkStr) => {
+      return chunkStr.split('\n').filter(p => p.trim() !== '');
+    };
+    
+    if (!isMobile) {
+      const spreads = [];
+      for (let i = 0; i < chunks.length; i += 2) {
+        spreads.push([formatChunk(chunks[i]), formatChunk(chunks[i+1] || "")]);
+      }
+      return spreads;
+    }
+    return chunks.map(chunk => [formatChunk(chunk)]);
+  }, [currentSurpriseText, isMobile]);
 
   const handleTabChange = (tab) => {
     if (tab === activeTab) return;
@@ -221,7 +286,7 @@ export default function App() {
             onClick={() => setIsSurpriseOpen(false)}
           >
             <motion.div
-              className="surprise-modal-content"
+              className="surprise-modal-content love-letter-modal"
               initial={{ scale: 0.8, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.8, y: 20 }}
@@ -230,23 +295,21 @@ export default function App() {
               <button className="close-modal" onClick={() => { setIsSurpriseOpen(false); setModalClicks(0); setShow1314(false); }}>
                 <X size={24} />
               </button>
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 15 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => {
-                  const next = modalClicks + 1;
-                  setModalClicks(next);
-                  if (next >= 3) setShow1314(true);
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                <Sparkles size={60} className="modal-icon-premium" />
-              </motion.div>
 
-              <h3 className="modal-title-premium">驚喜揭曉</h3>
-
-              <div style={{ marginTop: '1.5rem', fontFamily: 'var(--font-brand)', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.7)' }}>
-                THE FIRST DAY WE MET
+              <div className="love-letter-header">
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 15 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    const next = modalClicks + 1;
+                    setModalClicks(next);
+                    if (next >= 3) setShow1314(true);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <PenTool size={48} className="modal-icon-premium love-pen" />
+                </motion.div>
+                <h3 className="modal-title-premium love-title">Love Letter</h3>
               </div>
 
               <AnimatePresence>
@@ -261,8 +324,47 @@ export default function App() {
                 )}
               </AnimatePresence>
 
-              <div className="surprise-text-area-premium">
-                {currentSurpriseText}
+              <div className="love-letter-card-container">
+                <AnimatePresence mode="wait">
+                  <motion.div 
+                    key={loveLetterPage}
+                    initial={{ opacity: 0, rotateY: 30, x: 20, transformOrigin: "left" }}
+                    animate={{ opacity: 1, rotateY: 0, x: 0, transformOrigin: "left" }}
+                    exit={{ opacity: 0, rotateY: -30, x: -20, transformOrigin: "left" }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                    className="love-letter-spread"
+                  >
+                    {pages[loveLetterPage]?.map((column, colIdx) => (
+                      <div key={colIdx} className="love-letter-column">
+                        {column.map((p, pIdx) => (
+                          <p key={pIdx}>{p}</p>
+                        ))}
+                      </div>
+                    ))}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              <div className="love-letter-pagination">
+                <button 
+                  className={`page-btn ${loveLetterPage === 0 ? 'disabled' : ''}`}
+                  onClick={() => setLoveLetterPage(Math.max(0, loveLetterPage - 1))}
+                  disabled={loveLetterPage === 0}
+                  title="上一頁"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <div className="page-indicator-wrapper">
+                  <span className="page-indicator">Page {loveLetterPage + 1} of {pages.length}</span>
+                </div>
+                <button 
+                  className={`page-btn ${loveLetterPage >= pages.length - 1 ? 'disabled' : ''}`}
+                  onClick={() => setLoveLetterPage(Math.min(pages.length - 1, loveLetterPage + 1))}
+                  disabled={loveLetterPage >= pages.length - 1}
+                  title="下一頁"
+                >
+                  <ChevronRight size={20} />
+                </button>
               </div>
             </motion.div>
           </motion.div>
