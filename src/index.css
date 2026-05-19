@@ -228,7 +228,13 @@ label { display: block; font-size: 0.7rem; font-weight: 800; color: var(--accent
 
 /* Modern Modal Overlay */
 .surprise-modal-overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; padding: 2rem; }
-.surprise-modal-content { background: #0a0a0a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 40px; padding: 4rem 3rem; width: 100%; max-width: 700px; position: relative; text-align: center; box-shadow: 0 0 100px rgba(139, 92, 246, 0.2); }
+.surprise-modal-content { background: #0a0a0a; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 40px; padding: 4rem 3rem; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; position: relative; text-align: center; box-shadow: 0 0 100px rgba(139, 92, 246, 0.2); }
+
+/* Custom Scrollbar for Modal */
+.surprise-modal-content::-webkit-scrollbar { width: 6px; }
+.surprise-modal-content::-webkit-scrollbar-track { background: transparent; }
+.surprise-modal-content::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 10px; }
+.surprise-modal-content::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.6); }
 .close-modal { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: #475569; cursor: pointer; transition: 0.3s; }
 .close-modal:hover { color: #fff; transform: rotate(90deg); }
 .modal-icon-premium { color: var(--accent-color); margin-bottom: 2rem; filter: drop-shadow(0 0 20px var(--accent-glow)); }
@@ -259,16 +265,17 @@ label { display: block; font-size: 0.7rem; font-weight: 800; color: var(--accent
 }
 
 .surprise-text-area-premium { 
-  font-size: 1.1rem; 
-  line-height: 2.2; 
-  color: #e2e8f0; 
+  font-size: 1.05rem; 
+  line-height: 2.4; 
+  color: rgba(255, 255, 255, 0.85); 
   word-wrap: break-word; 
   white-space: pre-wrap; 
   margin-top: 1.5rem; 
-  padding: 2rem; 
+  padding: 2rem 1.5rem; 
   border-top: 1px solid rgba(255,255,255,0.05);
   font-weight: 300;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  text-align: justify;
 }
 
 /* Other Components */
